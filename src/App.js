@@ -18,6 +18,7 @@ function App() {
   const [generatedNumber, setGeneratedNumber] = useState("");
   const [currentBalance, setCurrentBalance] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
 
   const [tokenCount, setTokenCount] = useState(50);
   const [selectedNumber, setSelectedNumber] = useState("");
@@ -59,6 +60,7 @@ function App() {
   // ************************************* Place Bet *****************************************
   const placeBet = async (e) => {
     e.preventDefault();
+    setError(false);
 
     if (!isApproved) {
       alert("Approve 50 tokens to bet");
@@ -82,33 +84,31 @@ function App() {
 
     console.log(selectedNumber, seed);
 
-    try {
-      setLoading(true);
+    setLoading(true);
 
-      await game.methods
-        .bet(selectedNumber, seed)
-        .send({ from: account })
-        .on("confirmation", function (confNumber, { events }) {
-          setIsBetPlaced(true);
-          const { Bet } = events;
+    game.methods
+      .bet(selectedNumber, seed)
+      .send({ from: account })
+      .then(function ({ events }) {
+        setIsBetPlaced(true);
+        const { Bet } = events;
 
-          setReward(Bet.returnValues.reward);
-          setIsWinner(Bet.returnValues.isWinner);
-          setGeneratedNumber(Bet.returnValues.randomNumber);
+        setReward(Bet.returnValues.reward);
+        setIsWinner(Bet.returnValues.isWinner);
+        setGeneratedNumber(Bet.returnValues.randomNumber);
 
-          console.log(Bet);
-          console.log("called");
-        })
-        .on("error", function (error) {
-          console.log(error);
-        });
-      console.log("ouutside ON");
-    } catch (err) {
-      console.log(err);
-    } finally {
-      setLoading(false);
-      updateBalance(token, account);
-    }
+        // console.log(Bet);
+        console.log("called");
+      })
+      .catch(function (error) {
+        setIsBetPlaced(false);
+        setError(true);
+        console.log(error);
+      })
+      .finally(() => {
+        setLoading(false);
+        updateBalance(token, account);
+      });
 
     console.log("bet placed.");
   };
@@ -147,6 +147,7 @@ function App() {
     setTokenCount(50);
     setSelectedNumber("");
     setSeed("");
+    setError(false);
   };
 
   // ************************************* JSX *****************************************
@@ -205,6 +206,7 @@ function App() {
           </button>
         </div>
       </form>
+      {error && <p className="errorText">Error</p>}
       {isBetPlaced && (
         <>
           <p>Generated Number: {generatedNumber}</p>

@@ -28,3 +28,8 @@
   margin: 20px 10px 0;
   padding: 0.6rem 1rem;
 }
+
+.errorText {
+  color: red;
+  text-align: center;
+}
