@@ -3,7 +3,7 @@
   padding-top: 50px;
 }
 
-.App > b{
+.App > b {
   font-size: 2rem;
 }
 
@@ -20,7 +20,11 @@
   margin: 10px 20px;
 }
 
-.App__form > button {
-  margin: 20px auto 0;
+.App__form > div:last-of-type {
+  width: 100%;
+}
+
+.App__form button {
+  margin: 20px 10px 0;
   padding: 0.6rem 1rem;
 }
